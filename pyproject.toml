@@ -1,0 +1,139 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "care-metrics-exporter"
+version = "0.1.0"
+description = "Prometheus exporter for CARE's Celery queue depth, read directly from the Redis broker."
+authors = [
+    {name = "Open Healthcare Network", email = "info@ohc.network"}
+]
+license = {text = "MIT"}
+keywords = ["prometheus", "celery", "redis", "care", "ohc"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Monitoring",
+]
+requires-python = "==3.13.*"
+dependencies = [
+    "prometheus-client==0.26.0",
+    "redis==7.0.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/ohcnetwork/care"
+
+[project.scripts]
+care-metrics-exporter = "care_metrics_exporter.__main__:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["care_metrics_exporter*"]
+
+
+[tool.pytest.ini_options]
+testpaths = ["care_metrics_exporter"]
+markers = [
+    "integration: tests that require a live Redis on localhost:6379",
+]
+
+
+[tool.coverage.run]
+branch = true
+source = ["care_metrics_exporter"]
+omit = ["*/tests/**"]
+
+[tool.coverage.report]
+exclude_also = [
+  'def __repr__',
+  'raise AssertionError',
+  'raise NotImplementedError',
+  'if __name__ == .__main__.:',
+  'if TYPE_CHECKING:',
+]
+ignore_errors = true
+omit = ["*/tests/**"]
+
+
+[tool.ruff]
+target-version = "py313"
+include = ["*.py", "pyproject.toml"]
+
+[tool.ruff.lint]
+# https://docs.astral.sh/ruff/rules/
+select = [
+  "F",    # pyflakes
+  "E",    # pycodestyle errors
+  "W",    # pycodestyle warnings
+  "I",    # isort
+  "N",    # pep8-naming
+  "UP",   # pyupgrade
+  "S",    # flake8-bandit
+  "FBT",  # flake8-boolean-trap
+  "B",    # flake8-bugbear
+  "A",    # flake8-builtins
+  "COM",  # flake8-commas
+  "C4",   # flake8-comprehensions
+  "DTZ",  # flake8-datetimez
+  "T10",  # flake8-debugger
+  "EM",   # flake8-errmsg
+  "ISC",  # flake8-import-conventions
+  "ICN",  # flake8-import-order
+  "LOG",  # flake8-logging
+  "G",    # flake8-logging-format
+  "INP",  # flake8-no-pep420
+  "PIE",  # flake8-pie
+  "T20",  # flake8-print
+  "Q",    # flake8-quotes
+  "RSE",  # flake8-raise
+  "RET",  # flake8-return
+  "SLF",  # flake8-self
+  "SIM",  # flake8-simplify
+  "TID",  # flake8-tidy-imports
+  "INT",  # flake8-gettext
+  "PTH",  # flake8-use-pathlib
+  "ERA",  # eradicate
+  "PL",   # pylint
+  "FURB", # refurb
+  "RUF",  # ruff
+]
+unfixable = [
+  "T20", # don't remove print statements
+]
+ignore = [
+  "E203",    # whitespace-before-punctuation
+  "E501",    # line-too-long
+  "FBT001",  # boolean-type-hint-positional-argument
+  "FBT002",  # boolean-default-value-positional-argument
+  "SIM105",  # suppressible-exception
+  "PLR0913", # too-many-arguments
+  "PLW1641", # object does not have __hash__ method
+  "ISC001",  # conflicts with format
+  "COM812",  # conflicts with format
+  "RUF012",  # Too hard
+  "EM101",   # Why not!
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["E402", "F401"] # for imports
+"**/tests/**" = ["S101", "SLF001", "PLR2004"] # assertions, private access, literals
+
+[tool.ruff.lint.flake8-builtins]
+builtins-ignorelist = ["id", "list", "filter"]
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+
+[tool.ruff.lint.flake8-unused-arguments]
+ignore-variadic-names = true
+
+[tool.ruff.format]
+line-ending = "lf"

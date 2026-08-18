@@ -1,0 +1,21 @@
+# Keep the build context minimal: no VCS data, caches, local envs, or secrets.
+.git
+.gitignore
+.github
+.venv
+venv
+env
+**/__pycache__
+**/*.py[cod]
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+.env
+.env.*
+!.env.example
+docker-compose.yaml
+kubernetes
+Makefile
+README.md
+care_metrics_exporter/tests

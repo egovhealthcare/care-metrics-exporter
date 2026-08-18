@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: care-metrics-exporter
+  labels:
+    app.kubernetes.io/name: care-metrics-exporter
+    app.kubernetes.io/component: metrics-exporter
+    app.kubernetes.io/part-of: care
+spec:
+  # One replica is a cost default, not a correctness requirement. Prometheus
+  # distinguishes replicas by their target labels, so if you scale up, query
+  # queue depth with `max by (queue)` rather than `sum`.
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: care-metrics-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: care-metrics-exporter
+        app.kubernetes.io/component: metrics-exporter
+        app.kubernetes.io/part-of: care
+    spec:
+      # The exporter reads Redis over the pod network and calls no Kubernetes
+      # or cloud API, so it needs no service account token.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: exporter
+          image: ghcr.io/ohcnetwork/care-metrics-exporter:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: metrics
+              containerPort: 8000
+              protocol: TCP
+          env:
+            # Only this one key is mounted. The exporter must never receive the
+            # rest of CARE's backend secret.
+            - name: CELERY_BROKER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: care-backend-secret
+                  key: CELERY_BROKER_URL
+            - name: CELERY_QUEUES
+              value: "celery"
+            - name: LOG_LEVEL
+              value: "INFO"
+          # Both probes hit /healthz, which never contacts Redis. A broker
+          # outage must not restart the pod or withdraw the scrape target that
+          # is reporting the outage.
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL

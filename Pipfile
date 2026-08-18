@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+prometheus-client = "==0.26.0"
+redis = "==7.0.1"
+
+[dev-packages]
+pytest = "==8.4.2"
+ruff = "==0.16.3"
+
+[requires]
+python_version = "3.13"

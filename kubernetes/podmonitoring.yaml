@@ -1,0 +1,24 @@
+# Google Managed Service for Prometheus scrape configuration.
+#
+# Requires managed collection to be enabled on the cluster:
+#   gcloud container clusters update CLUSTER --enable-managed-prometheus --region REGION
+#
+# Apply this only after `kubectl get crd podmonitorings.monitoring.googleapis.com`
+# succeeds, otherwise the resource will be rejected.
+apiVersion: monitoring.googleapis.com/v1
+kind: PodMonitoring
+metadata:
+  name: care-metrics-exporter
+  labels:
+    app.kubernetes.io/name: care-metrics-exporter
+    app.kubernetes.io/part-of: care
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: care-metrics-exporter
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      # Must stay below the interval so a slow broker cannot overlap scrapes.
+      timeout: 10s
