@@ -320,7 +320,9 @@ Notes:
 - Pod and container security contexts are hardened: non-root, read-only root
   filesystem, all capabilities dropped, no privilege escalation,
   `RuntimeDefault` seccomp, and no service account token mounted.
-- Update the `image:` field — it defaults to a placeholder tag.
+- The manifest uses an immutable commit-SHA tag already published by the CI
+  workflow. Update that tag to the desired published commit when releasing a
+  newer exporter version.
 
 ## PromQL and alerting
 
