@@ -265,6 +265,26 @@ docker run --rm --entrypoint id care-metrics-exporter:dev
 
 It also runs cleanly with `--read-only`, since it writes nothing to disk.
 
+### Published images
+
+Every push to `main` builds the production Dockerfile and publishes the image
+to this repository's GitHub Container Registry package. The tag is the complete
+Git commit SHA:
+
+```text
+ghcr.io/jesbinjoseph/care-metrics-exporter:<commit-sha>
+```
+
+For example:
+
+```bash
+docker pull ghcr.io/jesbinjoseph/care-metrics-exporter:$(git rev-parse HEAD)
+```
+
+The workflow uses GitHub's automatically provided `GITHUB_TOKEN`; it does not
+need a separately configured registry password. Package visibility is managed
+from the repository's **Packages** page.
+
 ## Kubernetes
 
 The manifests in `kubernetes/` are a **minimal, self-contained deployment for
