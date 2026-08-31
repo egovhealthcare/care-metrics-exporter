@@ -1,0 +1,61 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: care-backend-care-be-celery-worker
+  namespace: care
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: care-backend-care-be-celery-worker
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    # Queue depth is a single broker-level value. AverageValue makes the desired
+    # replica count ceil(total queue depth / jobs per worker).
+    - type: External
+      external:
+        metric:
+          name: prometheus.googleapis.com|celery_queue_length|gauge
+          selector:
+            matchLabels:
+              metric.labels.queue: celery
+              resource.labels.project_id: devops-care
+              resource.labels.location: asia-south1-a
+              resource.labels.cluster: ohn-devops-care
+              resource.labels.namespace: monitoring
+              resource.labels.job: care-metrics-exporter
+              # Exporter replicas observe the same Redis queue. MAX prevents
+              # duplicate replicas from multiplying the queue depth.
+              reducer: REDUCE_MAX
+        target:
+          type: AverageValue
+          averageValue: "20"
+    # Retain the existing CPU signal. HPA uses the largest replica recommendation
+    # from all available metrics.
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      selectPolicy: Max
+      policies:
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+    scaleDown:
+      # Celery tasks can outlive a queue spike. Keep the existing conservative
+      # window so workers are not removed as soon as tasks become reserved.
+      stabilizationWindowSeconds: 900
+      selectPolicy: Max
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15

@@ -310,6 +310,10 @@ kubectl port-forward svc/care-metrics-exporter 8000:8000
 curl -s localhost:8000/metrics | grep celery_
 ```
 
+For the devops CARE cluster queue-depth HPA, adapter installation, verification,
+load testing, and rollback, see
+[`kubernetes/autoscaling/README.md`](kubernetes/autoscaling/README.md).
+
 Notes:
 
 - The Deployment injects **only** the `CELERY_BROKER_URL` key from
