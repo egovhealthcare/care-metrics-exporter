@@ -268,17 +268,17 @@ It also runs cleanly with `--read-only`, since it writes nothing to disk.
 ### Published images
 
 Every push to `main` builds the production Dockerfile and publishes the image
-to this repository's GitHub Container Registry package. The tag is the complete
-Git commit SHA:
+to this repository's GitHub Container Registry package with these tags:
 
 ```text
-ghcr.io/egovhealthcare/care-metrics-exporter:<commit-sha>
+ghcr.io/egovhealthcare/care-metrics-exporter:latest
+ghcr.io/egovhealthcare/care-metrics-exporter:latest-<workflow-run-number>
 ```
 
 For example:
 
 ```bash
-docker pull ghcr.io/egovhealthcare/care-metrics-exporter:$(git rev-parse HEAD)
+docker pull ghcr.io/egovhealthcare/care-metrics-exporter:latest
 ```
 
 The workflow uses GitHub's automatically provided `GITHUB_TOKEN`; it does not
