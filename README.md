@@ -272,13 +272,13 @@ to this repository's GitHub Container Registry package. The tag is the complete
 Git commit SHA:
 
 ```text
-ghcr.io/jesbinjoseph/care-metrics-exporter:<commit-sha>
+ghcr.io/egovhealthcare/care-metrics-exporter:<commit-sha>
 ```
 
 For example:
 
 ```bash
-docker pull ghcr.io/jesbinjoseph/care-metrics-exporter:$(git rev-parse HEAD)
+docker pull ghcr.io/egovhealthcare/care-metrics-exporter:$(git rev-parse HEAD)
 ```
 
 The workflow uses GitHub's automatically provided `GITHUB_TOKEN`; it does not

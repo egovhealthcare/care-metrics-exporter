@@ -34,7 +34,7 @@ spec:
       containers:
         - name: exporter
           # Immutable image published by .github/workflows/publish-container.yaml.
-          image: ghcr.io/jesbinjoseph/care-metrics-exporter:8ab2445d7cf88e6f335f1d951062c1b6f9df9a3d
+          image: ghcr.io/egovhealthcare/care-metrics-exporter:8ab2445d7cf88e6f335f1d951062c1b6f9df9a3d
           imagePullPolicy: IfNotPresent
           ports:
             - name: metrics
